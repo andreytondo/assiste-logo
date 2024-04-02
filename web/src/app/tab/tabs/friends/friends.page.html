@@ -1,0 +1,69 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Amigos
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Amigos</ion-title>
+      <ion-list>
+        @for (friend of friends$ | async; track $index) {
+        <ion-item >
+          <ion-grid>
+            <ion-row>
+              <ion-col size="auto" class="ion-text-start">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+                  @if (friend.imagePath) {
+                  <img [src]="friend.imagePath" />
+                  } @else {
+                  <ion-icon name="person-circle-outline" size="large" color="tertiary"></ion-icon>
+                  }
+                  <ion-text>
+                    <span>{{ friend.name }}</span>
+                  </ion-text>
+                </div>
+              </ion-col>
+
+              <ion-col size="auto">
+                <div style="display: flex; gap: 10px;">
+                  <div>
+                    <ion-thumbnail style="width: 95px; height: 120px;">
+                      <img
+                        src="https://cdn.awsli.com.br/2500x2500/1610/1610163/produto/177685277/poster-homem-aranha-sem-volta-para-casa-a-b32e7b56.jpg" />
+                    </ion-thumbnail>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <ion-text>
+                      Homem-Aranha: Sem Volta para Casa
+                    </ion-text>
+                    <ion-text color="medium">
+                      <span>“Filme muito bom, gostei muito”</span>
+                    </ion-text>
+
+
+                    <ion-text style="display: flex; align-items: end; gap: 4px; flex-grow: 1;">
+                      <span>7.5</span>
+                      <ion-icon name="star" color="warning"></ion-icon>
+                    </ion-text>
+                  </div>
+                </div>
+
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+        } @empty {
+        <ion-text class="ion-text-center">
+          <h1>Você não tem amigos.</h1>
+        </ion-text>
+        }
+      </ion-list>
+    </ion-toolbar>
+  </ion-header>
+
+</ion-content>

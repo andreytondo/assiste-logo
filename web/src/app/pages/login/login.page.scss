@@ -1,0 +1,7 @@
+.full-height {
+  display: flex;
+  flex-direction: column;
+  justify-content: center!important;
+  height: 100vh; /* This ensures that the div takes up full viewport height */
+  text-align: center; /* Optional: To ensure text and content are centered */
+}

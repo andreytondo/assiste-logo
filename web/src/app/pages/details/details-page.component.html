@@ -1,0 +1,159 @@
+<ng-container *ngIf="userMedia$ | async as userMedia;">
+    <ion-header>
+        <ion-toolbar>
+            <ion-buttons slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+            </ion-buttons>
+            <ion-title>{{ userMedia.mediaDetails.title || userMedia.mediaDetails.name }}</ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+        <div style="position: relative; display: flex; justify-content: start;">
+            <ion-thumbnail style="width: 100%; height: 210px;">
+                <img [src]="userMedia.mediaDetails.backdropPath" alt="Backdrop" />
+            </ion-thumbnail>
+            <div
+                style="display: flex; align-items: end; z-index: 1; position: absolute; top: 150px; padding: 20px; width: 100%; justify-content: space-between;">
+                <div style="justify-content: start; display: flex;  align-items: end; gap: 8px;">
+                    <ion-thumbnail style="width: 95px; height: 120px;">
+                        <img [src]="userMedia.mediaDetails.imagePath" alt="Poster" />
+                    </ion-thumbnail>
+                    <ion-label style="max-width: 250px;">
+                        <h2>{{ userMedia.mediaDetails.title || userMedia.mediaDetails.name }}</h2>
+                    </ion-label>
+                </div>
+                <div style="display: flex; justify-content: end; align-items: center;">
+                    <div [ngClass]="userMedia.userDetails.favorite ? 'heart-icon animate' : 'heart-icon'"
+                        (click)="toggleFavorite(userMedia.userDetails)"></div>
+                    <ion-icon [name]="userMedia.userDetails.review ? 'star' : 'star-outline'" color="warning"
+                        (click)="showfavoriteDialog(true)"></ion-icon>
+                </div>
+            </div>
+        </div>
+        <ion-grid style="margin-top: 80px;">
+            <div style="display: flex; justify-content: end; width: 100%;">
+                <ion-chip>
+                    <ion-label>{{ userMedia.mediaDetails.releaseDate | date: 'dd/MM/yyyy' }}</ion-label>
+                </ion-chip>
+
+                <ion-chip>
+                    <ion-label>{{ userMedia.mediaDetails.runtime || (userMedia.mediaDetails.seasons?.length + '
+                        seasons') }}</ion-label>
+                </ion-chip>
+
+                <ion-chip (click)="rotateStatus(userMedia.userDetails)"
+                    [color]="getColor(userMedia.userDetails.status | lowercase)">
+                    <ion-label>{{ userMedia.userDetails.status | titlecase }}</ion-label>
+                </ion-chip>
+            </div>
+            <ion-row>
+                <ion-col size="12">
+                    <ion-item>
+                        <ion-label>
+                            <p>{{ userMedia.mediaDetails.description }}</p>
+                        </ion-label>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+
+            <ng-container *ngIf="mediaType === 'show'">
+                <ion-row>
+                    <ion-col size="12">
+                        <ion-list>
+                            <ion-item>
+                                <ion-label>
+                                    <h2>Temporadas</h2>
+                                </ion-label>
+                            </ion-item>
+                            @for (season of userMedia.mediaDetails.seasons; track $index;) {
+                            <ion-item>
+                                <ion-label>
+                                    <h3>{{ season.name }} - Episódios: {{ season.episodes }}</h3>
+                                    <p>{{ season.aired | date: 'dd/MM/yyyy' }}</p>
+                                </ion-label>
+                            </ion-item>
+                            } @empty {
+                            <ion-item>
+                                <ion-label>
+                                    <h3>Não há temporadas disponíveis</h3>
+                                </ion-label>
+                            </ion-item>
+                            }
+                        </ion-list>
+                    </ion-col>
+                </ion-row>
+            </ng-container>
+        </ion-grid>
+    </ion-content>
+
+    <ion-modal [isOpen]="modalOpen">
+        <ng-template>
+            <ion-header>
+                <ion-toolbar>
+                    <ion-title>Avalie o filme</ion-title>
+                    <ion-buttons slot="end">
+                        <ion-button (click)="showfavoriteDialog(false)">Close</ion-button>
+                    </ion-buttons>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <ion-list>
+                    <ion-item>
+                        <ion-label position="stacked">Nota</ion-label>
+                        <ion-range label="" min="0" max="5" step="1" snaps="true"
+                            [(ngModel)]="userMedia.userDetails.rating">
+                            <ion-icon size="small" slot="start" name="star" color="primary"></ion-icon>
+                            <ion-icon size="small" slot="end" name="star"
+                                [color]="userMedia.userDetails.rating === 5 ? 'warning' : ''"></ion-icon>
+                        </ion-range>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label position="stacked">Comentário</ion-label>
+                        <ion-textarea label="" rows="6" [(ngModel)]="userMedia.userDetails.review"></ion-textarea>
+                    </ion-item>
+                </ion-list>
+                <ion-grid>
+                    <ion-row class="ion-justify-content-center">
+                        <ion-col size="4">
+                            <ion-button shape="round" color="primary" expand="full" class="ion-text-wrap"
+                                (click)="saveReview(userMedia.userDetails)">Salvar</ion-button>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+
+                <ion-item>
+                    <ion-label>
+                        <h2>Avaliações dos amigos</h2>
+                    </ion-label>
+                </ion-item>
+                <ion-list>
+                    <ion-item *ngFor="let friend of userMedia?.friends">
+                        <ion-thumbnail slot="start"
+                            style="display: flex; justify-content: center; align-items: center; gap: 2px; flex-direction: column;">
+                            <ion-icon name="person-circle-outline" color="primary" style="font-size: 64px;"></ion-icon>
+                            <ion-label>{{friend?.name}}</ion-label>
+                        </ion-thumbnail>
+                        <ion-label
+                            style="display: flex; justify-content: center; align-items: center; gap: 2px; flex-direction: column;">
+                            <p>{{ friend?.review }}</p>
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; gap: 2px; flex-direction: row; width: 100%;">
+                                <ion-label>
+                                    Nota: {{ friend?.rating }}
+                                    <ion-icon name="star" color="warning"></ion-icon>
+                                </ion-label>
+
+                                <ion-label
+                                    style="display: flex; justify-content: center; align-items: center; gap: 2px;">
+                                    Média: {{ (friend?.rating + userMedia.userDetails.rating) / 2 }}
+                                    <ion-icon name="star" color="warning"></ion-icon>
+                                </ion-label>
+                            </div>
+                        </ion-label>
+                    </ion-item>
+                </ion-list>
+            </ion-content>
+        </ng-template>
+    </ion-modal>
+</ng-container>

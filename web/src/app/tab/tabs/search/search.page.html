@@ -1,0 +1,62 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Pesquisar
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Pesquisar</ion-title>
+
+      <ion-chip (click)="changeSearchMode('movie')"
+        [color]="searchType === 'movie' ? 'success' : null">Filmes</ion-chip>
+      <ion-chip (click)="changeSearchMode('show')" [color]="searchType === 'show' ? 'success' : null">Séries</ion-chip>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12">
+        <ion-searchbar show-clear-button="focus" [debounce]="350" (ionInput)="handleSearchInput($event)"
+          [value]="searchQuery"></ion-searchbar>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ng-container *ngIf="search$ | async as response;else carregando">
+    <ion-list lines="inset">
+      <div stlye="display: flex; gap: 10px 0;">
+        <ng-container *ngFor="let item of response">
+          <ion-item [routerLink]="['/details/', searchType, item.id]">
+            <ion-thumbnail slot="start">
+              <img [src]="item.imagePath" alt="Poster">
+            </ion-thumbnail>
+            <ion-label>
+              <h2>{{ item.title || item.name }}</h2>
+              <p>{{ item.overview }}</p>
+            </ion-label>
+          </ion-item>
+        </ng-container>
+      </div>
+    </ion-list>
+  </ng-container>
+</ion-content>
+
+<ng-template #carregando>
+  <ion-content>
+    <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+      <ng-container *ngIf="loading;else emptySearch">
+        <ion-spinner name="crescent" duration="1000"></ion-spinner>
+      </ng-container>
+    </div>
+  </ion-content>
+</ng-template>
+
+<ng-template #emptySearch>
+  <ion-text class="ion-text-center">
+    <h1>{{customMessage}}</h1>
+  </ion-text>
+</ng-template>

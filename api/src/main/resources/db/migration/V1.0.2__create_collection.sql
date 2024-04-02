@@ -1,0 +1,20 @@
+-- create table collection
+-- (
+--     collectionid          serial primary key,
+--     userid      integer,
+--     name        varchar(150),
+--     description varchar(300),
+--     createdAt   timestamp,
+--     constraint fk_user foreign key (userid) references "user" (id) on delete cascade,
+--     constraint unique_name unique (userid, name)
+-- );
+--
+-- create table collectionmedia
+-- (
+--     collectionmediaid           serial primary key,
+--     collectionid integer,
+--     mediaid      integer,
+--     "order"      integer,
+--     constraint fk_collection foreign key (collectionid) references collection (id) on delete cascade,
+--     constraint unique_media unique nulls not distinct (collectionid, mediaid)
+-- );
